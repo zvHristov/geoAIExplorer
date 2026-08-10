@@ -1,0 +1,62 @@
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: geoai-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-geoai}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-geoai_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-geoai_explorer}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-geoai} -d ${POSTGRES_DB:-geoai_explorer}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    container_name: geoai-api
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-geoai}:${POSTGRES_PASSWORD:-geoai_secret}@db:5432/${POSTGRES_DB:-geoai_explorer}
+      DATABASE_URL_SYNC: postgresql://${POSTGRES_USER:-geoai}:${POSTGRES_PASSWORD:-geoai_secret}@db:5432/${POSTGRES_DB:-geoai_explorer}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./apps/api:/app
+      - api_cache:/app/.cache
+    depends_on:
+      db:
+        condition: service_healthy
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    container_name: geoai-web
+    env_file:
+      - .env
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_PUBLIC_MAPBOX_TOKEN: ${NEXT_PUBLIC_MAPBOX_TOKEN}
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - api
+    command: npm run dev
+
+volumes:
+  postgis_data:
+  api_cache:

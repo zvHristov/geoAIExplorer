@@ -1,0 +1,23 @@
+# GeoAI Explorer
+.env
+*.pyc
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+*.egg-info/
+.venv/
+venv/
+node_modules/
+.next/
+out/
+dist/
+*.tsbuildinfo
+*.log
+.DS_Store
+.idea/
+.vscode/
+apps/api/.cache/
+*.tif
+*.tiff
