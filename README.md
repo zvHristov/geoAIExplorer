@@ -2,6 +2,15 @@
 
 A web platform for analyzing geothermal potential using satellite data (Sentinel-2 NDVI + Landsat LST), faults, and known thermal springs.
 
+## Intended Use and Limitations
+
+GeoAI Explorer is a preliminary screening and prioritization tool.
+It does not estimate geothermal resource capacity, reservoir temperature,
+drillability, economics, or commercial viability.
+
+Results should be validated with field investigations, hydrogeological,
+geophysical and geochemical data, and expert review.
+
 ## Architecture
 
 ```
