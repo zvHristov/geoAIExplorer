@@ -19,7 +19,7 @@ apps/api   → FastAPI + Rasterio/GDAL + Planetary Computer STAC
 db/init    → PostGIS schema, seeded springs and fault segments
 ```
 
-## Heuristic Score (не AI Score)
+## Heuristic Score (no AI Score)
 
 ```
 score = 0.40·normalize(lst_anomaly)
